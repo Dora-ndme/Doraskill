@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>敦煌网跨境电商舆情日报 · 排版示例（模拟数据）</title>
+<!--
+  briefing-sample.html —— Doraskill 产出物排版示例
+
+  本文件仅用于演示 skill-Dora.md（SOP v10.0）第八部分锁定的日报排版：
+    - 页面宽度 760px 居中；系统无衬线字体；白底
+    - 板块标题 h2：左侧 4px 红色竖线（#e74c3c）
+    - 情感标签圆角 badge：Positive / Neutral / Negative 三档
+    - 说明区：黄底 #fff3cd + 黄色竖线 #ffc107
+
+  ⚠️ 页面内所有标题、来源、日期、摘要均为【虚构模拟数据】，
+     仅用于展示结构与视觉规范，不构成任何真实舆情收录。
+     真实日报须严格遵循 skill-Dora.md 第五部分（过滤规则）与第六部分（时间窗口）。
+-->
+<style>
+  body {
+    background: #ffffff;
+    font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 24px 0 48px;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  .sample-banner {
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin: 16px 0 4px;
+  }
+  .date-line {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 18px;
+    border-left: 4px solid #e74c3c;
+    padding-left: 10px;
+    margin: 28px 0 14px;
+  }
+  .item {
+    margin-bottom: 18px;
+    line-height: 1.7;
+    font-size: 14px;
+  }
+  .item a {
+    color: #1a0dab;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .item a:hover {
+    text-decoration: underline;
+  }
+  .meta {
+    font-size: 13px;
+    color: #555;
+    margin: 2px 0 4px;
+  }
+  .badge {
+    display: inline-block;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    line-height: 1.6;
+    vertical-align: 1px;
+  }
+  .badge-positive { background: #d4edda; color: #155724; }
+  .badge-neutral  { background: #e2e3e5; color: #383d41; }
+  .badge-negative { background: #f8d7da; color: #721c24; }
+  .note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #856404;
+    line-height: 1.7;
+    margin-top: 28px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="sample-banner">SAMPLE · 全站条目为虚构模拟数据，仅演示排版结构</div>
+
+  <h1>敦煌网跨境电商舆情日报</h1>
+  <div class="date-line">2026/09/07 · 周一 · 内部参考</div>
+
+  <h2>敦煌网自身动态</h2>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">敦煌网启动 2026 秋季产业带巡回招商，首站落地义乌小商品集群</a>
+    <div class="meta">亿邦动力 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
+    据亿邦动力报道，敦煌网宣布启动秋季产业带巡回招商活动，首站于义乌举行，面向小商品产业带工厂型卖家开放平台资源与半托管服务。（模拟摘要）
+  </div>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">网传敦煌网部分类目佣金调整引发卖家讨论，平台暂未官方回应</a>
+    <div class="meta">雨果跨境 [2026/09/07, <span class="badge badge-negative">Negative</span>]</div>
+    社交平台出现关于部分类目佣金比例调整的讨论帖，多位卖家表达关切；截至发稿敦煌网官方渠道未发布相关公告。（模拟摘要）
+  </div>
+
+  <h2>友商动态</h2>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">Temu 半托管模式覆盖国家扩至 80 个，本地卖家占比持续提升</a>
+    <div class="meta">亿邦动力 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
+    亿邦动力获悉，Temu 半托管业务近期完成新一轮市场扩容，覆盖国家数量进一步增加，平台本地履约卖家占比环比提升。（模拟摘要）
+  </div>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">SHEIN 被曝重启赴英上市筹备，估值讨论再起</a>
+    <div class="meta">腾讯新闻 [2026/09/07, <span class="badge badge-neutral">Neutral</span>]</div>
+    多家外媒援引知情人士消息称，SHEIN 正重新评估赴伦敦上市路径，相关讨论仍处早期阶段，公司方面未予置评。（模拟摘要）
+  </div>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">TikTok Shop 美区夏季大促收官：GMV 同比增长翻倍，直播场次创新高</a>
+    <div class="meta">AMZ123 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
+    第三方机构测算数据显示，TikTok Shop 美区夏季大促期间 GMV 同比显著增长，直播带货场次与达人参与数均创历史新高。（模拟摘要）
+  </div>
+
+  <h2>行业与政策</h2>
+
+  <div class="item">
+    <a href="#" title="（模拟条目）">跨境电商零售出口"9610"退税流程再简化，多地综试区落地细则</a>
+    <div class="meta">中国新闻网 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
+    海关总署近期就跨境电商零售出口退税流程出台便利化措施，多地跨境电商综试区同步发布落地细则，降低企业合规成本。（模拟摘要）
+  </div>
+
+  <div class="note">
+    <b>说明区（透明标注）</b><br>
+    本页为排版示例：收录 6 条（自身动态 2、友商动态 3、行业与政策 1），覆盖 2026/09/07。<br>
+    ① 全站条目为模拟数据，标题/来源/摘要均为虚构，链接未指向真实详情页；② 真实日报须经信源核验与过滤规则（SOP 第五部分）逐条校验；③ 数据报告类等非当日收录会在真实版本中于此处标注真实发布日期；④ 若某友商当日无战略级动态，其板块条目整体省略。
+  </div>
+
+</div>
+</body>
+</html>

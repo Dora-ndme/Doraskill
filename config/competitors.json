@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "name": "Doraskill 检索配置",
+    "description": "九家友商检索关键词矩阵 + 五大检索维度，提取自 skill-Dora.md（SOP v10.0）第四部分。字段与原文一一对应，未增删。",
+    "source": "skill-Dora.md §4.1 / §4.2",
+    "retrieval_rule": "每家友商每次检索至少组合 1 个主关键词 + 1 个数据向关键词，不能只搜战略词",
+    "dimension_rule": "每次生成日报，五大检索维度必须至少覆盖一轮",
+    "version": "1.0.0"
+  },
+  "retrieval_dimensions": [
+    {
+      "id": "strategy",
+      "name": "战略动作",
+      "keywords": ["战略", "合作", "招商", "签约", "布局", "上线", "发布", "入驻", "开放", "升级", "转型", "闭门会", "峰会", "大会"]
+    },
+    {
+      "id": "data_report",
+      "name": "数据报告",
+      "keywords": ["GMV", "营收", "业绩", "上半年", "下半年", "报告", "发布", "超越", "突破", "份额", "增长", "数据", "排名", "榜单", "市场规模", "CAGR", "渗透率"],
+      "mandatory_sources": ["Momentum Works", "Marketplace Pulse", "ecommerceDB", "data.ai", "Statista", "Similarweb", "Flywheel"]
+    },
+    {
+      "id": "earnings",
+      "name": "业绩财报",
+      "keywords": ["季度财报", "Q2", "Q3", "年报", "净营收", "净利润", "活跃买家", "GMV", "超预期", "指引", "财报"],
+      "include": "友商业绩快讯（营收/GMV/活跃买家超预期、季度指引）",
+      "exclude": "纯股价/市值/减持/增发/回购炒作"
+    },
+    {
+      "id": "logistics_product",
+      "name": "物流产品",
+      "keywords": ["物流产品", "三日达", "五日达", "十日达", "履约", "配送", "专线", "包机", "海外仓网络", "智慧物流"],
+      "include": "平台级物流产品发布（如菜鸟全球三日达、速卖通平台配，行业基建）",
+      "exclude": "友商仓储运营细节（建仓/关仓/扩容/智能枢纽仓）"
+    },
+    {
+      "id": "policy",
+      "name": "政策监管",
+      "keywords": ["政策", "新规", "监管", "合规", "退税", "增值税法", "关税", "综试区", "海外仓", "9610", "9710", "9810", "1210", "退运免税", "跨境贸易便利化", "外汇"],
+      "mandatory_sources": ["海关总署", "财政部", "税务总局", "商务部", "外汇局", "各综试区官网"]
+    }
+  ],
+  "competitors": [
+    {
+      "name": "Temu",
+      "aliases": [],
+      "primary_keywords": ["Temu 半托管", "Temu 全托管", "Temu 本地卖家", "Temu 招商"],
+      "data_keywords": ["Temu GMV", "Temu 下载量", "Temu MAU", "Temu 份额"],
+      "priority_sources": ["亿邦 ebrungo", "出海网", "AMZ123", "PRNewswire"]
+    },
+    {
+      "name": "SHEIN",
+      "aliases": ["希音"],
+      "primary_keywords": ["SHEIN 平台化", "SHEIN 第三方", "SHEIN 招商", "SHEIN 供应链"],
+      "data_keywords": ["SHEIN 估值", "SHEIN IPO", "SHEIN 营收", "SHEIN GMV", "SHEIN 招股书"],
+      "priority_sources": ["腾讯新闻", "新浪财经", "路透", "亿邦"]
+    },
+    {
+      "name": "速卖通",
+      "aliases": ["AliExpress"],
+      "primary_keywords": ["速卖通 Brand+", "速卖通 海外托管", "速卖通 Choice", "速卖通 招商"],
+      "data_keywords": ["速卖通 GMV", "速卖通 本地仓占比", "速卖通 品牌增长"],
+      "priority_sources": ["阿斯达克", "出海网", "亿邦", "网经社"]
+    },
+    {
+      "name": "亚马逊",
+      "aliases": ["Amazon"],
+      "primary_keywords": ["亚马逊 全球开店", "亚马逊 产业带", "亚马逊 下一代跨境链", "亚马逊 新卖家"],
+      "data_keywords": ["亚马逊 Q2 营收", "亚马逊 Q3 营收", "亚马逊 AWS", "亚马逊 卖家份额", "亚马逊 中国卖家占比"],
+      "priority_sources": ["亚马逊官网 gs.amazon.cn", "亿邦", "Marketplace Pulse", "腾讯新闻"]
+    },
+    {
+      "name": "TikTok Shop",
+      "aliases": [],
+      "primary_keywords": ["TikTok Shop 直播", "TikTok Shop 达人", "TikTok Shop 东南亚", "TikTok Shop 招商", "TikTok Shop 峰会"],
+      "data_keywords": ["TikTok Shop GMV", "TikTok Shop 美区", "TikTok Shop 印尼", "TikTok Shop 卖家数", "TikTok Shop 达人"],
+      "priority_sources": ["AMZ123", "TT123", "DNY123", "Momentum Works", "Channel NewsAsia"]
+    },
+    {
+      "name": "Shopee",
+      "aliases": [],
+      "primary_keywords": ["Shopee 东南亚", "Shopee 跨境", "Shopee 轻出海", "Shopee 3PF", "Shopee 激励大会"],
+      "data_keywords": ["Shopee 收入", "Shopee GMV", "Shopee 访问量", "Shopee 巴西份额"],
+      "priority_sources": ["网经社", "DNY123", "雨果", "data.ai"]
+    },
+    {
+      "name": "Lazada",
+      "aliases": [],
+      "primary_keywords": ["Lazada 东南亚", "Lazada LazMall", "Lazada 3PF", "Lazada AI", "Lazada 招商"],
+      "data_keywords": ["Lazada GMV", "Lazada 订单", "Lazada 品牌增长"],
+      "priority_sources": ["雨果", "亿邦", "DNY123"]
+    },
+    {
+      "name": "eBay",
+      "aliases": [],
+      "primary_keywords": ["eBay 国际配送", "eBay eIS", "eBay Depop", "eBay 招商"],
+      "data_keywords": ["eBay Q2 营收", "eBay Q3 营收", "eBay GMV", "eBay 活跃买家"],
+      "priority_sources": ["亿邦 ebrungo", "网经社", "腾讯新闻"]
+    },
+    {
+      "name": "京东Joybuy",
+      "aliases": [],
+      "primary_keywords": ["京东 Joybuy 欧洲", "京东 Joybuy 精选市场", "京东 Joybuy 211限时达", "京东 Joybuy 招商"],
+      "data_keywords": ["Joybuy 下载榜", "Joybuy Trustpilot", "Joybuy 覆盖城市"],
+      "priority_sources": ["出海网", "今日头条（原创媒体号）", "网经社"]
+    }
+  ],
+  "self_monitoring": {
+    "name": "敦煌网",
+    "keywords": ["敦煌网", "DHgate 平台", "DHgate 战略", "DHgate 动态"],
+    "priority_sources": ["亿邦 ebrungo", "敦煌网卖家中心 seller.dhgate.com"]
+  },
+  "industry_policy": {
+    "keywords": ["跨境电商 行业", "跨境电商 政策", "跨境电商 数据", "跨境电商 出口", "跨境电商 增长", "跨境电商 报告"],
+    "focus": ["跨境垂直媒体", "官方媒体", "政府官网"],
+    "exclude": ["合集/早报/周报", "一般外贸（轻工业/服务贸易/宏观进出口）", "进口相关"]
+  }
+}
