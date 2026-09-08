@@ -1,0 +1,72 @@
+{
+  "report_date": "2026-09-07",
+  "briefing": [
+    {
+      "section": "self",
+      "title": "敦煌网启动 2026 秋季产业带巡回招商，首站落地义乌小商品集群",
+      "url": "https://example.com/demo/dhgate-autumn-sourcing",
+      "source": "亿邦动力",
+      "date": "2026-09-07",
+      "sentiment": "Positive",
+      "summary": "据亿邦动力报道，敦煌网宣布启动秋季产业带巡回招商活动，首站于义乌举行，面向小商品产业带工厂型卖家开放平台资源与半托管服务。（模拟摘要）"
+    },
+    {
+      "section": "self",
+      "title": "网传敦煌网部分类目佣金调整引发卖家讨论，平台暂未官方回应",
+      "url": "https://example.com/demo/dhgate-commission-discussion",
+      "source": "雨果跨境",
+      "date": "2026-09-07",
+      "sentiment": "Negative",
+      "summary": "社交平台出现关于部分类目佣金比例调整的讨论帖，多位卖家表达关切；截至发稿敦煌网官方渠道未发布相关公告。（模拟摘要）"
+    },
+    {
+      "section": "competitors",
+      "platform": "Temu",
+      "title": "Temu 半托管模式覆盖国家扩至 80 个，本地卖家占比持续提升",
+      "url": "https://example.com/demo/temu-80-countries",
+      "source": "亿邦动力",
+      "date": "2026-09-07",
+      "sentiment": "Positive",
+      "summary": "亿邦动力获悉，Temu 半托管业务近期完成新一轮市场扩容，覆盖国家数量进一步增加，平台本地履约卖家占比环比提升。（模拟摘要）"
+    },
+    {
+      "section": "competitors",
+      "platform": "SHEIN",
+      "title": "SHEIN 被曝重启赴英上市筹备，估值讨论再起",
+      "url": "https://example.com/demo/shein-ipo-uk",
+      "source": "腾讯新闻",
+      "date": "2026-09-07",
+      "sentiment": "Neutral",
+      "summary": "多家外媒援引知情人士消息称，SHEIN 正重新评估赴伦敦上市路径，相关讨论仍处早期阶段，公司方面未予置评。（模拟摘要）"
+    },
+    {
+      "section": "competitors",
+      "platform": "TikTok Shop",
+      "title": "TikTok Shop 美区夏季大促收官：GMV 同比增长翻倍，直播场次创新高",
+      "url": "https://example.com/demo/tts-summer-sale",
+      "source": "AMZ123",
+      "date": "2026-09-07",
+      "sentiment": "Positive",
+      "summary": "第三方机构测算数据显示，TikTok Shop 美区夏季大促期间 GMV 同比显著增长，直播带货场次与达人参与数均创历史新高。（模拟摘要）"
+    },
+    {
+      "section": "industry",
+      "title": "跨境电商零售出口“9610”退税流程再简化，多地综试区落地细则",
+      "url": "https://example.com/demo/9610-export-refund",
+      "source": "中国新闻网",
+      "date": "2026-09-05",
+      "published_date": "2026-09-05",
+      "sentiment": "Positive",
+      "summary": "海关总署近期就跨境电商零售出口退税流程出台便利化措施，多地跨境电商综试区同步发布落地细则，降低企业合规成本。（模拟摘要）"
+    }
+  ],
+  "meta": {
+    "compliance": "全站条目为模拟数据，仅供演示录入与渲染链路；真实收录须经 SOP 第五部分过滤规则与 Step 5 信源核验。",
+    "exclusions": [
+      "（示例）剔除 XX号自媒体 2 条、合集/早报 1 条"
+    ],
+    "special": [
+      "（示例）行业与政策 1 条为近 2-3 日数据/政策例外，真实发布日期 2026/09/05，已在说明区标注"
+    ]
+  }
+}

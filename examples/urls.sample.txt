@@ -1,0 +1,7 @@
+# Doraskill 链接预检示例清单（每行一个 URL，# 开头为注释）
+# 运行：python scripts/check_sources.py --urls examples/urls.sample.txt
+# 前两行可达，第三行应为 GONE(404)，第四行应为 DNS 失败 —— 演示分级结果
+https://example.com/
+https://github.com/
+https://github.com/dora-ndme/this-page-should-404-doraskill-demo
+https://invalid-domain-doraskill-test.invalid/

@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Dora-ndme/Doraskill/blob/main/config/briefing-entry.schema.json",
+  "title": "Doraskill 舆情日报条目 Schema",
+  "description": "日报结构化录入的字段契约。字段定义与 skill-Dora.md（SOP v10.0）逐条对应：标题一字不差（§8.1）、来源只写媒体名（§8.1）、情感三档（§8.2）、收录日期/数据报告例外（§6）、平台取值与 config/competitors.json 的 name 对齐（§4.2）。",
+  "type": "object",
+  "required": ["report_date", "briefing"],
+  "additionalProperties": true,
+  "properties": {
+    "report_date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "报告日期（收录日）。生成 HTML 时标题行与检索窗口均以此为基准。"
+    },
+    "briefing": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/entry" },
+      "description": "收录条目列表。渲染时按 SOP §2.1 固定板块顺序输出：self → competitors → industry，不受文件内顺序影响。"
+    },
+    "meta": { "$ref": "#/definitions/meta" }
+  },
+  "definitions": {
+    "entry": {
+      "type": "object",
+      "required": ["section", "title", "url", "source", "date", "sentiment", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "section": {
+          "enum": ["self", "competitors", "industry"],
+          "description": "所属板块：self=敦煌网自身动态 / competitors=友商动态 / industry=行业与政策（对应 SOP §2.1 三大板块；自身无动态时整板块省略）。"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "description": "仅 section=competitors 时必填。取值与 config/competitors.json 的 name 一致（Temu / SHEIN / 速卖通 / 亚马逊 / TikTok Shop / Shopee / Lazada / eBay / 京东Joybuy）。"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "与新闻原文标题一字不差，直接复制，不得改写（SOP 核心原则 9 / §8.1）。"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "单篇详情页直链（http/https）。禁止首页/频道页/列表页/标签页，优先 PC 直链避免 m 站跳转（SOP 核心原则 6/7）。"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "来源只写媒体名（如“亿邦动力”），不加括号与平台属性（SOP §8.1）。必须属 SOP 第三部分授权梯队。"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "收录日期。非当日收录须符合 SOP 第六部分时间窗口（数据报告类可放宽至近 2-3 日）。"
+        },
+        "published_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "真实发布日期（可选）。数据报告类例外收录近 2-3 日内容时必填，生成器会在说明区透明标注。"
+        },
+        "sentiment": {
+          "enum": ["Positive", "Neutral", "Negative"],
+          "description": "情感标签，必须基于原文事实（SOP 核心原则 11）。"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "2-3 句摘要，取自原文，不得编造、不得主观总结（SOP 核心原则 10 / §8.1）。"
+        },
+        "note": {
+          "type": "string",
+          "description": "单条特殊处理备注（可选），渲染时进入说明区。例如：用户指定链接纳入、物流/财报边界冲突按用户指令收录等（SOP §10.1）。"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "section": { "const": "competitors" } } },
+          "then": { "required": ["platform"] }
+        }
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "compliance": {
+          "type": "string",
+          "description": "信源合规说明（可选），默认文案由生成器补全。"
+        },
+        "exclusions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "本次排除项（可选，逐条进入说明区），例如：剔除 XX号自媒体 2 条、合集早报 1 条。"
+        },
+        "special": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "特殊处理说明（可选，逐条进入说明区），例如：某友商当日无战略级动态故省略。"
+        }
+      }
+    }
+  }
+}

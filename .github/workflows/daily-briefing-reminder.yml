@@ -1,0 +1,108 @@
+name: Daily Briefing Reminder
+
+# 友商动态更新提醒（Roadmap #8）
+# 每个工作日 09:00（北京时间，= UTC 01:00）自动生成当日检索计划，
+# 并开一条 Issue 提醒执行人照计划检索（SOP v10.0 第七部分 9 步）。
+#
+# 说明：本工作流只做「检索计划提醒 + 盲区自查清单」，不代替人工检索；
+#       真正的内容抓取与 AI 初筛需结合搜索引擎/API 凭据，超出公开 CI 范围。
+
+on:
+  schedule:
+    - cron: "0 1 * * 1-5"   # 周一至周五 01:00 UTC = 09:00 北京
+  workflow_dispatch:        # 支持手动触发
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate daily search plan
+        id: plan
+        env:
+          TZ: Asia/Shanghai
+        run: |
+          TODAY="$(date +%F)"
+          echo "today=${TODAY}" >> "$GITHUB_OUTPUT"
+          python scripts/generate_search_plan.py --date "$TODAY" --out plan.md
+          echo "生成检索计划：$(grep -c '推荐 query' plan.md || true) 家友商"
+
+      - name: Open reminder issue (skip if today already exists)
+        uses: actions/github-script@v7
+        env:
+          TODAY: ${{ steps.plan.outputs.today }}
+        with:
+          script: |
+            const today = process.env.TODAY;
+            const title = `📋 舆情日报检索计划 · ${today}`;
+
+            // 若今天已存在同名 Issue 则跳过（避免重复打扰）
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100,
+            });
+            const dup = existing.find(i => i.title === title);
+            if (dup) {
+              console.log(`今日提醒已存在：#${dup.number}，跳过`);
+              return;
+            }
+
+            const fs = require("fs");
+            const plan = fs.existsSync("plan.md")
+              ? fs.readFileSync("plan.md", "utf8")
+              : "（计划生成失败，请手动运行 generate_search_plan.py）";
+
+            const body = `## 今日检索提醒（SOP v10.0 · 第七部分 9 步）
+
+${plan}
+
+---
+
+### 盲区自查清单（生成日报前逐项过一遍）
+
+- [ ] 是否查了亿邦 ebrungo/zb 快讯栏？（防漏业绩快讯）
+- [ ] 是否查了 AMZ123/TT123/DNY123？（防漏第三方数据报告）
+- [ ] 是否查了中国新闻网/央视网？（防漏平台级物流产品）
+- [ ] 是否组合了数据向关键词（GMV/营收/份额）？（防漏数据报告）
+- [ ] 财报是否区分了"业绩快讯"vs"股价炒作"？
+- [ ] 物流是否区分了"平台级产品"vs"仓储运营细节"？
+- [ ] 数据报告类是否放宽到近 2-3 日？
+- [ ] 合集/早报内的单条是否找到了独立原文？
+- [ ] XX号来源是否替换为授权信源？
+
+---
+_自动生成于 GitHub Actions，检索完成并产出日报后请关闭本 Issue。_`;
+
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ["舆情日报"],
+              });
+            } catch (err) {
+              // 仓库中尚无该 label 时降级为不带 label 创建
+              console.log(`带 label 创建失败（${err.message}），降级重试`);
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+              });
+            }
+            console.log(`已创建提醒 Issue：${title}`);

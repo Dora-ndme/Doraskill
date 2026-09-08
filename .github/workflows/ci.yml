@@ -1,0 +1,52 @@
+name: CI
+
+# 冒烟测试：任何 push / PR 时验证 Doraskill 工具链仍可运行
+#   - generate_search_plan.py（检索计划生成）
+#   - render_briefing.py      （条目 -> HTML，--strict 全量校验示例数据）
+#   - csv_to_entries.py       （CSV 模板 -> JSON 转换链路）
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate search plan smoke test
+        run: |
+          python scripts/generate_search_plan.py --date 2026-09-08 --out /tmp/plan.md
+          test -s /tmp/plan.md && echo "✅ generate_search_plan OK"
+
+      - name: Render briefing smoke test (strict validation)
+        run: |
+          python scripts/render_briefing.py --entries examples/entries.sample.json \
+            --out /tmp/briefing.html --strict
+          test -s /tmp/briefing.html && echo "✅ render_briefing OK"
+
+      - name: CSV template -> JSON smoke test
+        run: |
+          python scripts/csv_to_entries.py examples/entries.template.csv \
+            --out /tmp/entries.json
+          python -c "import json; d=json.load(open('/tmp/entries.json',encoding='utf-8')); \
+                     assert d['briefing']; print('✅ csv_to_entries OK:', len(d['briefing']), '条')"
+
+      - name: Repo structure sanity
+        run: |
+          test -f skill-Dora.md
+          test -f config/competitors.json
+          test -f config/briefing-entry.schema.json
+          echo "✅ 关键文件齐全"

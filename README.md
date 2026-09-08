@@ -10,7 +10,7 @@
 
 做舆情监测的人都知道：日报难的不是"写"，而是**稳定复现一套高标准**——今天记得查数据报告、明天就漏了；这条新闻该收、那条是软文不该收，标准稍一模糊，质量就波动。
 
-Doraskill 把一套经过 **10 个版本迭代** 的舆情日报 SOP 开源出来，让它从"个人经验"变成"可复用、可执行、可被校验的标准"。仓库以 `skill-Dora.md`（SOP v10.0，唯一执行依据）为核心，并逐步补充可运行的工程组件（检索配置、计划生成脚本、示例产出物）。
+Doraskill 把一套经过 **10 个版本迭代** 的舆情日报 SOP 开源出来，让它从"个人经验"变成"可复用、可执行、可被校验的标准"。仓库以 `skill-Dora.md`（SOP v10.0，唯一执行依据）为核心，配套一整套可运行的工程组件：检索配置 → 计划生成 → 批量预检 → 结构化录入 → 一键渲染（含 CI 与定时提醒）。
 
 它适合：
 
@@ -25,6 +25,14 @@ Doraskill 把一套经过 **10 个版本迭代** 的舆情日报 SOP 开源出�
 | `config/competitors.json` | 机器可读检索配置：五大维度关键词 + 九家友商矩阵 + 行业政策/自身监测关键词（与 SOP §4.1/§4.2 一一对应） |
 | `scripts/generate_search_plan.py` | 检索计划生成器：读取配置，为指定日期生成"照做即可"的当日检索计划（纯标准库，离线可跑） |
 | `examples/briefing-sample.html` | 日报排版示例（SOP §8.2 视觉规范：760px 红头排版 / 三档情感 badge / 说明区），条目为虚构模拟数据 |
+| `config/briefing-entry.schema.json` | 日报条目录入字段契约（JSON Schema）：与 SOP 各硬规则逐条对应的字段定义 |
+| `examples/entries.sample.json` | 结构化条目示例（生成器输入，与 briefing-sample.html 同源 6 条） |
+| `examples/entries.template.csv` | Excel/WPS 手工录入模板（UTF-8 BOM，直接打开不乱码） |
+| `scripts/csv_to_entries.py` | CSV 模板 → JSON 转换器（含字段校验与平台对齐检查） |
+| `scripts/render_briefing.py` | HTML 日报生成器：条目 → 合规排版，内置字段/时间窗口/过滤规则自动校验 |
+| `scripts/check_sources.py` | 信源链接批量可访问性预检（404/403/超时/DNS/跳首页），支持并发 |
+| `examples/urls.sample.txt` | 链接预检演示清单 |
+| `.github/workflows/` | CI 冒烟测试（push 自动验证工具链）+ 工作日 09:00 检索计划提醒 Issue |
 
 ## 仓库结构
 
@@ -32,11 +40,21 @@ Doraskill 把一套经过 **10 个版本迭代** 的舆情日报 SOP 开源出�
 Doraskill/
 ├── skill-Dora.md                  # SOP v10.0 · 唯一执行依据（人类可读 + AI 可执行）
 ├── config/
-│   └── competitors.json           # 五大维度关键词 + 九家友商检索矩阵
+│   ├── competitors.json           # 五大维度关键词 + 九家友商检索矩阵
+│   └── briefing-entry.schema.json # 日报条目录入字段契约（JSON Schema）
 ├── scripts/
-│   └── generate_search_plan.py    # 生成当日检索计划（Python 标准库，无依赖）
+│   ├── generate_search_plan.py    # 生成当日检索计划（纯标准库，无依赖）
+│   ├── csv_to_entries.py          # CSV 录入模板 → JSON 转换器
+│   ├── render_briefing.py         # 条目 → SOP §8.2 合规排版 HTML（内置过滤规则校验）
+│   └── check_sources.py           # 信源链接批量预检（404/403/超时/跳首页）
 ├── examples/
-│   └── briefing-sample.html       # 日报排版示例（模拟数据，仅供结构参考）
+│   ├── briefing-sample.html       # 日报排版示例（模拟数据，仅供结构参考）
+│   ├── entries.sample.json        # 结构化条目示例（生成器输入）
+│   ├── entries.template.csv       # Excel/WPS 手工录入模板
+│   └── urls.sample.txt            # 链接预检演示清单
+├── .github/workflows/
+│   ├── ci.yml                     # push/PR 冒烟测试（三脚本链路自动验证）
+│   └── daily-briefing-reminder.yml# 工作日 09:00 自动开检索计划提醒 Issue
 ├── README.md
 └── LICENSE                        # MIT
 ```
@@ -85,16 +103,35 @@ python scripts/generate_search_plan.py --date 2026-09-08 --out plan.md
 4. 对每个候选链接 WebFetch 核验：标题一字不差 · 发布日期 · 摘要取自原文 · 情感标签 · 信源合规
 5. 逐条过过滤规则（**第五部分**：XX号自媒体 / 合集周报 / 仓储细节 / 低权重站等一律排除）
 
-### ③ 排版输出
+### ③ 结构化录入条目
 
-参照 `skill-Dora.md` **第八部分** 与 `examples/briefing-sample.html` 的视觉规范：
+每个通过核验的候选条目，按 `config/briefing-entry.schema.json` 的字段契约录入（标题与原文一字不差 / 来源只写媒体名 / 三档情感 / 时间窗口……）。两种方式任选：
 
-- 页面 760px 居中，板块标题左侧 4px 红色竖线
-- 每条新闻 = 加粗超链接标题（与原文一字不差）+ 来源 + `[日期, 情感标签]` + 2-3 句原文摘要
-- 情感标签三档圆角 badge：`Positive`（绿）/ `Neutral`（灰）/ `Negative`（红）
-- 底部黄底说明区：透明标注收录条数、日期范围、信源合规说明、排除项、特殊处理
+- **JSON（规范输入，渲染器直接消费）**：参考 `examples/entries.sample.json`；
+- **CSV（Excel/WPS 手工录入）**：按 `examples/entries.template.csv` 填列，再转换：
 
-### ④ 质量校验
+```bash
+python scripts/csv_to_entries.py examples/entries.template.csv --out entries.json
+```
+
+可选：WebFetch 逐条核验前，可先用预检脚本批量筛掉 404/403/超时/跳首页的链接（对应 SOP 核心原则 8 / §5.1#7/#9）：
+
+```bash
+python scripts/check_sources.py --urls candidate-links.txt
+python scripts/check_sources.py --entries examples/entries.sample.json --out precheck.md
+```
+
+### ④ 一键渲染合规 HTML
+
+```bash
+python scripts/render_briefing.py --entries entries.json --out 日报-2026-09-08.html
+```
+
+生成器自动完成：字段/时间窗口校验 → 可确定性过滤规则自动拦截（XX号自媒体、合集/周报/早报字眼、非详情页链接、低权重站等，SOP §5.1）→ 按 §2.1 固定板块顺序排版（空板块整体省略）→ 输出 SOP §8.2 锁定样式（760px 居中 / 4px 红竖线 h2 / 三档情感圆角 badge / 黄底说明区自动标注收录数与日期范围、排除项、数据报告例外真实发布日期）。
+
+> ⚠️ 语义级规则（§5.2 财报"业绩快讯 vs 股价炒作"、物流"平台级产品 vs 仓储运营细节"）需人工研判——脚本只对**可确定性判定**的规则自动拦截，语义层保留给执行人（宁可漏收，不可误杀）。
+
+### ⑤ 质量校验
 
 生成前过一遍 **第九部分盲区自查清单**（是否查了 ebrungo 快讯栏 / AMZ123 等第三方数据源 / 央视网物流产品；数据报告是否放宽近 2-3 日；财报是否区分"业绩快讯 vs 股价炒作"……）。
 
@@ -112,10 +149,11 @@ python scripts/generate_search_plan.py --date 2026-09-08 --out plan.md
 - [x] 九家友商检索矩阵机器可读化（`config/competitors.json`）
 - [x] 检索计划生成器（`scripts/generate_search_plan.py`）
 - [x] 日报排版示例（`examples/briefing-sample.html`）
-- [ ] 日报条目结构化录入模板（CSV/JSON Schema）
-- [ ] HTML 日报生成器（配置 + 条目数据 → 合规排版 HTML，自动过过滤规则）
-- [ ] 信源可访问性批量预检脚本（防 404/403）
-- [ ] 友商动态更新提醒（GitHub Actions 定时检索）
+- [x] 日报条目结构化录入模板（`config/briefing-entry.schema.json` + `examples/entries.template.csv` + `scripts/csv_to_entries.py`）
+- [x] HTML 日报生成器（`scripts/render_briefing.py`：条目 → 合规排版，内置字段/时间窗口/过滤规则自动校验）
+- [x] 信源可访问性批量预检脚本（`scripts/check_sources.py`，防 404/403/超时/跳首页）
+- [x] 友商动态更新提醒（GitHub Actions：工作日 09:00 自动开检索计划 Issue + 盲区自查清单）
+- [ ] 检索结果半自动整理器：把搜索引擎/API 返回的候选结果转成待核验条目清单（接上条提醒的最后一公里）
 
 ## 许可
 
