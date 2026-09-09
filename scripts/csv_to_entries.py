@@ -14,7 +14,7 @@
     - 纯标准库；csv 文件建议 UTF-8（带 BOM 亦可，自动兼容）
     - section 取值 self/competitors/industry；sentiment 取值 Positive/Neutral/Negative
     - section=competitors 时 platform 必填（取值见 config/competitors.json 的 name）
-    - meta（说明区备注）不在 CSV 列中，转出后可在 JSON 中手工补充
+    - meta（合规说明/排除项等结构化元信息）不在 CSV 列中，转出后可在 JSON 中手工补充
 """
 from __future__ import annotations
 
@@ -117,7 +117,7 @@ def main() -> None:
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(out, encoding="utf-8")
-        print(f"[ok] 已转换 {len(entries)} 条 -> {args.out}\n提示: 打开后请补 report_date 与 meta 说明区字段")
+        print(f"[ok] 已转换 {len(entries)} 条 -> {args.out}\n提示: 打开后请补 report_date 与 meta 结构化元信息字段")
     else:
         sys.stdout.write(out)
 

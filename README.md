@@ -24,7 +24,7 @@ Doraskill 把一套经过 **10 个版本迭代** 的舆情日报 SOP 开源出�
 | `skill-Dora.md` | **SOP v10.0（唯一执行依据）**：核心原则、三大板块、信源梯队与信源池、五大检索维度、九家友商关键词矩阵、过滤规则细化对照表、时间窗口分层、每日 9 步 SOP、标题/摘要/排版硬规则、质量校验四步法与盲区自查清单、版本演进记录 |
 | `config/competitors.json` | 机器可读检索配置：五大维度关键词 + 九家友商矩阵 + 行业政策/自身监测关键词（与 SOP §4.1/§4.2 一一对应） |
 | `scripts/generate_search_plan.py` | 检索计划生成器：读取配置，为指定日期生成"照做即可"的当日检索计划（纯标准库，离线可跑） |
-| `examples/briefing-sample.html` | 日报排版示例（SOP §8.2 视觉规范：760px 红头排版 / 三档情感 badge / 说明区），条目为虚构模拟数据 |
+| `examples/briefing-sample.html` | 日报排版示例（SOP §8.2 视觉规范：760px 居中 / 分享标题格式 / 三档情感 badge），条目为虚构模拟数据 |
 | `config/briefing-entry.schema.json` | 日报条目录入字段契约（JSON Schema）：与 SOP 各硬规则逐条对应的字段定义 |
 | `examples/entries.sample.json` | 结构化条目示例（生成器输入，与 briefing-sample.html 同源 6 条） |
 | `examples/entries.template.csv` | Excel/WPS 手工录入模板（UTF-8 BOM，直接打开不乱码） |
@@ -127,9 +127,9 @@ python scripts/check_sources.py --entries examples/entries.sample.json --out pre
 python scripts/render_briefing.py --entries entries.json --out 日报-2026-09-08.html
 ```
 
-生成器自动完成：字段/时间窗口校验 → 可确定性过滤规则自动拦截（XX号自媒体、合集/周报/早报字眼、非详情页链接、低权重站等，SOP §5.1）→ 按 §2.1 固定板块顺序排版（空板块整体省略）→ 输出 SOP §8.2 锁定样式（760px 居中 / 4px 红竖线 h2 / 三档情感圆角 badge / 黄底说明区自动标注收录数与日期范围、排除项、数据报告例外真实发布日期）。
+生成器自动完成：字段/时间窗口校验 → 可确定性过滤规则自动拦截（XX号自媒体、合集/周报/早报字眼、非详情页链接、低权重站等，SOP §5.1）→ 按 §2.1 固定板块顺序排版（空板块整体省略）→ 输出 SOP §8.2 锁定样式（760px 居中 / 主标题「【WorkBuddy】敦煌网舆情日报_YYYY年M月D日」分享格式 / 板块标题「一、自身监测」「二、友商动态」「三、行业与政策」+ 4px 红竖线 / 三档情感圆角 badge，无底部说明区）。
 
-> ✅ 生成器内置语义过滤层（`render_briefing.py`）：§5.2 财报/物流域按 SOP 细化对照表自动判定——**命中排除侧信号（纯股价炒作/仓储运营细节）且无纳入侧要素 → 自动拦截（exit 1）**；纳入/排除信号并存或归类不确定 → warn（`--strict` 升级为 error）；`note` 注明"用户指定"的条目按 §10.1 豁免自动拦截（error 降级 warn），渲染时说明区透明标注。词表与判定见脚本顶部常量与 `semantic_checks()`。
+> ✅ 生成器内置语义过滤层（`render_briefing.py`）：§5.2 财报/物流域按 SOP 细化对照表自动判定——**命中排除侧信号（纯股价炒作/仓储运营细节）且无纳入侧要素 → 自动拦截（exit 1）**；纳入/排除信号并存或归类不确定 → warn（`--strict` 升级为 error）；`note` 注明"用户指定"的条目按 §10.1 豁免自动拦截（error 降级 warn）。词表与判定见脚本顶部常量与 `semantic_checks()`。
 
 ### ⑤ 质量校验
 
@@ -140,7 +140,7 @@ python scripts/render_briefing.py --entries entries.json --out 日报-2026-09-08
 | 内容类型 | 收录窗口 |
 | --- | --- |
 | 友商战略动作 / 业绩快讯 | 当日 |
-| 第三方数据报告 | 近 2-3 日（唯一例外，需在说明区标注真实发布日期） |
+| 第三方数据报告 | 近 2-3 日（唯一例外，按 `published_date` 字段记录真实发布日期） |
 | 平台级物流产品 / 行业政策 | 当日 + 近 1-2 日 |
 
 ## Roadmap

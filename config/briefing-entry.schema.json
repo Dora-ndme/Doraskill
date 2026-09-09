@@ -58,7 +58,7 @@
         "published_date": {
           "type": "string",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-          "description": "真实发布日期（可选）。数据报告类例外收录近 2-3 日内容时必填，生成器会在说明区透明标注。"
+          "description": "真实发布日期（可选）。数据报告类例外收录近 2-3 日内容时必填，据此字段记录真实发布日期。"
         },
         "sentiment": {
           "enum": ["Positive", "Neutral", "Negative"],
@@ -71,7 +71,7 @@
         },
         "note": {
           "type": "string",
-          "description": "单条特殊处理备注（可选），渲染时进入说明区。例如：用户指定链接纳入、物流/财报边界冲突按用户指令收录等（SOP §10.1）。"
+          "description": "单条特殊处理备注（可选），作为结构化字段记录。例如：用户指定链接纳入、物流/财报边界冲突按用户指令收录等（SOP §10.1）。"
         }
       },
       "allOf": [
@@ -91,12 +91,12 @@
         "exclusions": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "本次排除项（可选，逐条进入说明区），例如：剔除 XX号自媒体 2 条、合集早报 1 条。"
+          "description": "本次排除项（可选，作为结构化字段记录），例如：剔除 XX号自媒体 2 条、合集早报 1 条。"
         },
         "special": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "特殊处理说明（可选，逐条进入说明区），例如：某友商当日无战略级动态故省略。"
+          "description": "特殊处理说明（可选，作为结构化字段记录），例如：某友商当日无战略级动态故省略。"
         }
       }
     }

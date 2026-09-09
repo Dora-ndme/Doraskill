@@ -11,11 +11,11 @@
        （排除）"。命中排除侧信号且无纳入侧要素 → 自动拦截；纳入/排除
        信号并存（边界冲突）或归类不确定 → warn（--strict 升级为 error）。
        note 注明"用户指定/用户指令/指定链接"的条目按 SOP §10.1 豁免
-       自动拦截（error 降级 warn，渲染时说明区透明标注）。
+       自动拦截（error 降级 warn）。
     4. 按 SOP §2.1 固定板块顺序输出（self → competitors → industry，空板块整体省略）
-    5. 渲染锁定排版 v4（760px 居中 / 标题「敦煌网舆情日报」加大 / 日期在标题下方 /
+    5. 渲染锁定排版 v5（760px 居中 / 主标题「【WorkBuddy】敦煌网舆情日报_YYYY年M月D日」分享格式 /
        板块标题「一、自身监测」「二、友商动态」「三、行业与政策」+ 4px 红色竖线 /
-       深色标题 + 来源/日期/badge 元信息行 + <p.summary> 摘要 / 黄底说明区）
+       深色标题 + 来源/日期/badge 元信息行 + <p.summary> 摘要，不输出底部说明区）
 
 用法:
     python scripts/render_briefing.py --entries examples/entries.sample.json --out report.html
@@ -42,7 +42,6 @@ SECTIONS = {
 SENTIMENTS = {"Positive", "Neutral", "Negative"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SECTION_ORDER = ["self", "competitors", "industry"]
-WEEKDAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
 
 # —— 过滤规则自动校验（SOP §5.1 / §3.3 可确定性子集）——
 XXHAO_SOURCE_RE = re.compile(r"百家号|搜狐号|网易号|头条号|公众号营销号|营销号")
@@ -182,7 +181,7 @@ def validate(doc: dict, strict: bool = False) -> list[str]:
             elif age > 3:
                 err(f"{tag} 超出收录时间窗口：date {date_s} 早于报告日 {age} 天（SOP §6 仅数据报告类例外放宽近 2-3 日）")
             elif 1 <= age <= 3 and not e.get("published_date"):
-                warn(f"{tag} 为非当日收录（早 {age} 天），建议补 published_date 以便说明区透明标注")
+                warn(f"{tag} 为非当日收录（早 {age} 天），建议补 published_date 字段记录真实发布日期")
 
         pd_s = e.get("published_date") or ""
         if pd_s and not DATE_RE.match(pd_s):
@@ -229,7 +228,7 @@ def validate(doc: dict, strict: bool = False) -> list[str]:
             if level == "error" and not user_pinned:
                 err(f"{tag} {msg}")
             else:
-                suffix = "（note 注明用户指定，按 SOP §10.1 收录并在说明区透明标注）" \
+                suffix = "（note 注明用户指定，按 SOP §10.1 收录）" \
                     if user_pinned and level == "error" else ""
                 warn(f"{tag} {msg}{suffix}")
 
@@ -248,18 +247,12 @@ _CSS = """
   }
   .page { max-width: 760px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
   h1 {
-    font-size: 32px;
+    font-size: 22px;
     font-weight: 700;
     text-align: center;
-    margin: 24px 0 8px;
-    letter-spacing: 2px;
+    margin: 24px 0 28px;
+    letter-spacing: 1px;
     color: #1a1a1a;
-  }
-  .date-line {
-    text-align: center;
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 32px;
   }
   h2 {
     font-size: 20px;
@@ -312,15 +305,6 @@ _CSS = """
     margin: 0;
     text-align: justify;
   }
-  .note {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: #856404;
-    line-height: 1.7;
-    margin-top: 32px;
-  }
 """
 
 _SECTION_LABEL = {"self": "一、自身监测", "competitors": "二、友商动态", "industry": "三、行业与政策"}
@@ -337,24 +321,21 @@ def _cn_date(d: str) -> str:
 
 
 def render(doc: dict, title: str = "敦煌网舆情日报") -> str:
-    report_date = _parse_date(doc["report_date"])
     briefing = doc["briefing"]
-    meta = doc.get("meta") or {}
 
     # 按固定板块顺序分组，空板块省略（SOP §2.1 / §2.2 宁缺毋滥）
     buckets: dict[str, list[dict]] = {k: [] for k in SECTION_ORDER}
     for e in briefing:
         buckets[e["section"]].append(e)
 
-    date_line = _cn_date(doc["report_date"])
+    # 主标题：【WorkBuddy】敦煌网舆情日报_2026年9月9日（分享标题格式，日期并入标题）
+    h1_title = f"【WorkBuddy】{title}_{_cn_date(doc['report_date'])}"
 
     parts: list[str] = []
-    counts: dict[str, int] = {}
     for sec in SECTION_ORDER:
         items = buckets[sec]
         if not items:
             continue
-        counts[sec] = len(items)
         parts.append(f"  <h2>{_SECTION_LABEL[sec]}</h2>\n")
         for e in items:
             badge_cls = f"badge-{e['sentiment'].lower()}"
@@ -369,41 +350,16 @@ def render(doc: dict, title: str = "敦煌网舆情日报") -> str:
             parts.append(f"    <p class=\"summary\">{html.escape(e['summary'])}</p>")
             parts.append("  </div>\n")
 
-    # —— 说明区（透明标注：收录条数/日期范围/合规/排除项/特殊处理）——
-    dates = sorted({_parse_date(e["date"]) for e in briefing})
-    range_txt = f"{_fmt(dates[0].isoformat())}–{_fmt(dates[-1].isoformat())}" if len(dates) > 1 else _fmt(dates[0].isoformat())
-    note_lines = [
-        f"收录 {len(briefing)} 条（敦煌网自身动态 {counts.get('self', 0)}、友商动态 {counts.get('competitors', 0)}、"
-        f"行业与政策 {counts.get('industry', 0)}），覆盖日期范围 {range_txt}。",
-    ]
-    note_lines.append(meta.get("compliance") or
-                      "全站条目已按 skill-Dora.md（SOP v10.0）信源梯队、过滤规则与时间窗口收录。")
-
-    exc = meta.get("exclusions") or []
-    for x in exc:
-        note_lines.append(f"排除项：{x}")
-    special = list(meta.get("special") or [])
-    for e in briefing:
-        if e.get("note"):
-            special.append(f"〔{e['title'][:18]}…〕{e['note']}")
-        pd = e.get("published_date")
-        if pd and pd != e.get("date"):
-            special.append(f"〔{e['title'][:18]}…〕数据报告/政策例外，真实发布 {_fmt(pd)}")
-    for s in special:
-        note_lines.append(f"特殊处理：{s}")
-
-    note_html = "<br>\n    ".join(html.escape(x) for x in note_lines)
-
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{html.escape(title)} · {_fmt(doc['report_date'])}</title>
+<title>{html.escape(h1_title)}</title>
 <!--
   {html.escape(title)} —— 由 scripts/render_briefing.py 依据
   config/briefing-entry.schema.json 结构化条目自动生成（Doraskill）。
-  排版遵循 skill-Dora.md（SOP v10.0）第八部分锁定样式 v4。
+  排版遵循 skill-Dora.md（SOP v10.0）第八部分锁定样式 v5。
   生成时间：{dt.datetime.now().isoformat(timespec='seconds')}
 -->
 <style>
@@ -413,15 +369,9 @@ def render(doc: dict, title: str = "敦煌网舆情日报") -> str:
 <body>
 <div class="page">
 
-  <h1>{html.escape(title)}</h1>
-  <div class="date-line">{date_line}</div>
+  <h1>{html.escape(h1_title)}</h1>
 
 {''.join(parts)}
-  <div class="note">
-    <b>说明区（透明标注）</b><br>
-    {note_html}
-  </div>
-
 </div>
 </body>
 </html>
