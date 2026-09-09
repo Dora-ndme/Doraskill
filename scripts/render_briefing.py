@@ -13,7 +13,9 @@
        note 注明"用户指定/用户指令/指定链接"的条目按 SOP §10.1 豁免
        自动拦截（error 降级 warn，渲染时说明区透明标注）。
     4. 按 SOP §2.1 固定板块顺序输出（self → competitors → industry，空板块整体省略）
-    5. 渲染锁定排版 v3（760px 居中 / 4px 红色竖线 h2 / 三档情感圆角 badge / 黄底说明区）
+    5. 渲染锁定排版 v4（760px 居中 / 标题「敦煌网舆情日报」加大 / 日期在标题下方 /
+       板块标题「一、自身监测」「二、友商动态」「三、行业与政策」+ 4px 红色竖线 /
+       深色标题 + 来源/日期/badge 元信息行 + <p.summary> 摘要 / 黄底说明区）
 
 用法:
     python scripts/render_briefing.py --entries examples/entries.sample.json --out report.html
@@ -242,51 +244,99 @@ _CSS = """
     font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
     color: #333;
     margin: 0;
-    padding: 24px 0 48px;
+    padding: 32px 0 64px;
   }
-  .page { max-width: 760px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; }
-  h1 { font-size: 22px; text-align: center; margin: 16px 0 4px; }
-  .date-line { text-align: center; color: #666; font-size: 13px; margin-bottom: 24px; }
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin: 24px 0 8px;
+    letter-spacing: 2px;
+    color: #1a1a1a;
+  }
+  .date-line {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
   h2 {
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: 700;
     border-left: 4px solid #e74c3c;
-    padding-left: 10px;
-    margin: 28px 0 14px;
+    padding-left: 12px;
+    margin: 36px 0 18px;
+    line-height: 1.4;
+    color: #1a1a1a;
   }
-  .item { margin-bottom: 18px; line-height: 1.7; font-size: 14px; }
-  .item a { color: #1a0dab; font-weight: 700; text-decoration: none; }
+  .item {
+    margin-bottom: 28px;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+  .item a {
+    color: #1a1a1a;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
   .item a:hover { text-decoration: underline; }
-  .meta { font-size: 13px; color: #555; margin: 2px 0 4px; }
+  .meta {
+    font-size: 13px;
+    color: #999;
+    margin: 0 0 8px;
+  }
+  .meta .source {
+    color: #4a90e2;
+    font-weight: 500;
+  }
+  .meta .date {
+    margin-left: 6px;
+  }
   .badge {
     display: inline-block;
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: 11px;
+    border-radius: 10px;
+    padding: 2px 10px;
+    font-size: 12px;
     line-height: 1.6;
-    vertical-align: 1px;
+    margin-left: 10px;
   }
   .badge-positive { background: #d4edda; color: #155724; }
   .badge-neutral  { background: #e2e3e5; color: #383d41; }
   .badge-negative { background: #f8d7da; color: #721c24; }
+  .summary {
+    color: #555;
+    margin: 0;
+    text-align: justify;
+  }
   .note {
     background: #fff3cd;
     border-left: 4px solid #ffc107;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 12px;
     color: #856404;
     line-height: 1.7;
-    margin-top: 28px;
+    margin-top: 32px;
   }
 """
 
-_SECTION_LABEL = {"self": "敦煌网自身动态", "competitors": "友商动态", "industry": "行业与政策"}
+_SECTION_LABEL = {"self": "一、自身监测", "competitors": "二、友商动态", "industry": "三、行业与政策"}
 
 
 def _fmt(d: str) -> str:
     return d.replace("-", "/")
 
 
-def render(doc: dict, title: str = "敦煌网跨境电商舆情日报") -> str:
+def _cn_date(d: str) -> str:
+    """YYYY-MM-DD -> 2026年9月9日"""
+    y, m, day = d.split("-")
+    return f"{y}年{int(m)}月{int(day)}日"
+
+
+def render(doc: dict, title: str = "敦煌网舆情日报") -> str:
     report_date = _parse_date(doc["report_date"])
     briefing = doc["briefing"]
     meta = doc.get("meta") or {}
@@ -296,7 +346,7 @@ def render(doc: dict, title: str = "敦煌网跨境电商舆情日报") -> str:
     for e in briefing:
         buckets[e["section"]].append(e)
 
-    date_line = f"{_fmt(doc['report_date'])} · {WEEKDAYS[report_date.weekday()]} · 内部参考"
+    date_line = _cn_date(doc["report_date"])
 
     parts: list[str] = []
     counts: dict[str, int] = {}
@@ -310,10 +360,13 @@ def render(doc: dict, title: str = "敦煌网跨境电商舆情日报") -> str:
             badge_cls = f"badge-{e['sentiment'].lower()}"
             parts.append("  <div class=\"item\">")
             parts.append(f"    <a href=\"{html.escape(e['url'])}\">{html.escape(e['title'])}</a>")
-            meta_line = f"{html.escape(e['source'])} [{_fmt(e['date'])}, "
-            parts.append("    <div class=\"meta\">" + meta_line +
-                         f"<span class=\"badge {badge_cls}\">{html.escape(e['sentiment'])}</span>]</div>")
-            parts.append(f"    {html.escape(e['summary'])}")
+            meta_line = (
+                f'<span class="source">{html.escape(e["source"])}</span>'
+                f'  <span class="date">{_fmt(e["date"])}</span>'
+                f'  <span class="badge {badge_cls}">{html.escape(e["sentiment"])}</span>'
+            )
+            parts.append("    <div class=\"meta\">" + meta_line + "</div>")
+            parts.append(f"    <p class=\"summary\">{html.escape(e['summary'])}</p>")
             parts.append("  </div>\n")
 
     # —— 说明区（透明标注：收录条数/日期范围/合规/排除项/特殊处理）——
@@ -350,7 +403,7 @@ def render(doc: dict, title: str = "敦煌网跨境电商舆情日报") -> str:
 <!--
   {html.escape(title)} —— 由 scripts/render_briefing.py 依据
   config/briefing-entry.schema.json 结构化条目自动生成（Doraskill）。
-  排版遵循 skill-Dora.md（SOP v10.0）第八部分锁定样式 v3。
+  排版遵循 skill-Dora.md（SOP v10.0）第八部分锁定样式 v4。
   生成时间：{dt.datetime.now().isoformat(timespec='seconds')}
 -->
 <style>
@@ -381,7 +434,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="结构化条目 -> SOP §8.2 合规排版 HTML")
     ap.add_argument("--entries", required=True, type=Path, help="条目 JSON（符合 config/briefing-entry.schema.json）")
     ap.add_argument("--out", "-o", type=Path, help="输出 HTML 路径；缺省打印到 stdout")
-    ap.add_argument("--title", default="敦煌网跨境电商舆情日报", help="页头标题（默认：敦煌网跨境电商舆情日报）")
+    ap.add_argument("--title", default="敦煌网舆情日报", help="页头标题（默认：敦煌网舆情日报）")
     ap.add_argument("--strict", action="store_true", help="将 warn 级问题升级为 error（CI 用）")
     args = ap.parse_args()
 

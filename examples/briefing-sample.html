@@ -7,9 +7,11 @@
 <!--
   briefing-sample.html —— Doraskill 产出物排版示例
 
-  本文件仅用于演示 skill-Dora.md（SOP v10.0）第八部分锁定的日报排版：
+  本文件仅用于演示 skill-Dora.md（SOP v10.0）第八部分锁定的日报排版 v4：
     - 页面宽度 760px 居中；系统无衬线字体；白底
-    - 板块标题 h2：左侧 4px 红色竖线（#e74c3c）
+    - 主标题「敦煌网舆情日报」居中加大，日期在主标题下方
+    - 板块标题 h2：「一、自身监测」「二、友商动态」「三、行业与政策」，左侧 4px 红色竖线
+    - 标题：深色粗体；元信息行：来源 + 日期 + 圆角 badge 横向排列
     - 情感标签圆角 badge：Positive / Neutral / Negative 三档
     - 说明区：黄底 #fff3cd + 黄色竖线 #ffc107
 
@@ -42,59 +44,80 @@
     letter-spacing: 1px;
   }
   h1 {
-    font-size: 22px;
+    font-size: 32px;
+    font-weight: 700;
     text-align: center;
-    margin: 16px 0 4px;
+    margin: 24px 0 8px;
+    letter-spacing: 2px;
+    color: #1a1a1a;
   }
   .date-line {
     text-align: center;
-    color: #666;
-    font-size: 13px;
-    margin-bottom: 24px;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 32px;
   }
   h2 {
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: 700;
     border-left: 4px solid #e74c3c;
-    padding-left: 10px;
-    margin: 28px 0 14px;
+    padding-left: 12px;
+    margin: 36px 0 18px;
+    line-height: 1.4;
+    color: #1a1a1a;
   }
   .item {
-    margin-bottom: 18px;
-    line-height: 1.7;
-    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.8;
+    font-size: 15px;
   }
   .item a {
-    color: #1a0dab;
-    font-weight: 700;
+    color: #1a1a1a;
+    font-weight: 600;
     text-decoration: none;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 16px;
   }
   .item a:hover {
     text-decoration: underline;
   }
   .meta {
     font-size: 13px;
-    color: #555;
-    margin: 2px 0 4px;
+    color: #999;
+    margin: 0 0 8px;
+  }
+  .meta .source {
+    color: #4a90e2;
+    font-weight: 500;
+  }
+  .meta .date {
+    margin-left: 6px;
   }
   .badge {
     display: inline-block;
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: 11px;
+    border-radius: 10px;
+    padding: 2px 10px;
+    font-size: 12px;
     line-height: 1.6;
-    vertical-align: 1px;
+    margin-left: 10px;
   }
   .badge-positive { background: #d4edda; color: #155724; }
   .badge-neutral  { background: #e2e3e5; color: #383d41; }
   .badge-negative { background: #f8d7da; color: #721c24; }
+  .summary {
+    color: #555;
+    margin: 0;
+    text-align: justify;
+  }
   .note {
     background: #fff3cd;
     border-left: 4px solid #ffc107;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 12px;
     color: #856404;
     line-height: 1.7;
-    margin-top: 28px;
+    margin-top: 32px;
   }
 </style>
 </head>
@@ -103,49 +126,49 @@
 
   <div class="sample-banner">SAMPLE · 全站条目为虚构模拟数据，仅演示排版结构</div>
 
-  <h1>敦煌网跨境电商舆情日报</h1>
-  <div class="date-line">2026/09/07 · 周一 · 内部参考</div>
+  <h1>敦煌网舆情日报</h1>
+  <div class="date-line">2026年9月9日</div>
 
-  <h2>敦煌网自身动态</h2>
+  <h2>一、自身监测</h2>
 
   <div class="item">
     <a href="#" title="（模拟条目）">敦煌网启动 2026 秋季产业带巡回招商，首站落地义乌小商品集群</a>
-    <div class="meta">亿邦动力 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
-    据亿邦动力报道，敦煌网宣布启动秋季产业带巡回招商活动，首站于义乌举行，面向小商品产业带工厂型卖家开放平台资源与半托管服务。（模拟摘要）
+    <div class="meta"><span class="source">亿邦动力</span>  <span class="date">2026/09/07</span>  <span class="badge badge-positive">Positive</span></div>
+    <p class="summary">据亿邦动力报道，敦煌网宣布启动秋季产业带巡回招商活动，首站于义乌举行，面向小商品产业带工厂型卖家开放平台资源与半托管服务。</p>
   </div>
 
   <div class="item">
     <a href="#" title="（模拟条目）">网传敦煌网部分类目佣金调整引发卖家讨论，平台暂未官方回应</a>
-    <div class="meta">雨果跨境 [2026/09/07, <span class="badge badge-negative">Negative</span>]</div>
-    社交平台出现关于部分类目佣金比例调整的讨论帖，多位卖家表达关切；截至发稿敦煌网官方渠道未发布相关公告。（模拟摘要）
+    <div class="meta"><span class="source">雨果跨境</span>  <span class="date">2026/09/07</span>  <span class="badge badge-negative">Negative</span></div>
+    <p class="summary">社交平台出现关于部分类目佣金比例调整的讨论帖，多位卖家表达关切；截至发稿敦煌网官方渠道未发布相关公告。</p>
   </div>
 
-  <h2>友商动态</h2>
+  <h2>二、友商动态</h2>
 
   <div class="item">
     <a href="#" title="（模拟条目）">Temu 半托管模式覆盖国家扩至 80 个，本地卖家占比持续提升</a>
-    <div class="meta">亿邦动力 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
-    亿邦动力获悉，Temu 半托管业务近期完成新一轮市场扩容，覆盖国家数量进一步增加，平台本地履约卖家占比环比提升。（模拟摘要）
+    <div class="meta"><span class="source">亿邦动力</span>  <span class="date">2026/09/07</span>  <span class="badge badge-positive">Positive</span></div>
+    <p class="summary">亿邦动力获悉，Temu 半托管业务近期完成新一轮市场扩容，覆盖国家数量进一步增加，平台本地履约卖家占比环比提升。</p>
   </div>
 
   <div class="item">
     <a href="#" title="（模拟条目）">SHEIN 被曝重启赴英上市筹备，估值讨论再起</a>
-    <div class="meta">腾讯新闻 [2026/09/07, <span class="badge badge-neutral">Neutral</span>]</div>
-    多家外媒援引知情人士消息称，SHEIN 正重新评估赴伦敦上市路径，相关讨论仍处早期阶段，公司方面未予置评。（模拟摘要）
+    <div class="meta"><span class="source">腾讯新闻</span>  <span class="date">2026/09/07</span>  <span class="badge badge-neutral">Neutral</span></div>
+    <p class="summary">多家外媒援引知情人士消息称，SHEIN 正重新评估赴伦敦上市路径，相关讨论仍处早期阶段，公司方面未予置评。</p>
   </div>
 
   <div class="item">
     <a href="#" title="（模拟条目）">TikTok Shop 美区夏季大促收官：GMV 同比增长翻倍，直播场次创新高</a>
-    <div class="meta">AMZ123 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
-    第三方机构测算数据显示，TikTok Shop 美区夏季大促期间 GMV 同比显著增长，直播带货场次与达人参与数均创历史新高。（模拟摘要）
+    <div class="meta"><span class="source">AMZ123</span>  <span class="date">2026/09/07</span>  <span class="badge badge-positive">Positive</span></div>
+    <p class="summary">第三方机构测算数据显示，TikTok Shop 美区夏季大促期间 GMV 同比显著增长，直播带货场次与达人参与数均创历史新高。</p>
   </div>
 
-  <h2>行业与政策</h2>
+  <h2>三、行业与政策</h2>
 
   <div class="item">
     <a href="#" title="（模拟条目）">跨境电商零售出口"9610"退税流程再简化，多地综试区落地细则</a>
-    <div class="meta">中国新闻网 [2026/09/07, <span class="badge badge-positive">Positive</span>]</div>
-    海关总署近期就跨境电商零售出口退税流程出台便利化措施，多地跨境电商综试区同步发布落地细则，降低企业合规成本。（模拟摘要）
+    <div class="meta"><span class="source">中国新闻网</span>  <span class="date">2026/09/07</span>  <span class="badge badge-positive">Positive</span></div>
+    <p class="summary">海关总署近期就跨境电商零售出口退税流程出台便利化措施，多地跨境电商综试区同步发布落地细则，降低企业合规成本。</p>
   </div>
 
   <div class="note">
