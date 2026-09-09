@@ -63,6 +63,16 @@ Doraskill/
 
 只需 Python 3.9+，无任何第三方依赖。
 
+### 📋 复制给 Agent 的一句话指令
+
+如果你正在使用 WorkBuddy / CodeBuddy 等 Agent，直接把下面这段指令粘贴发送，即可按本 skill 完成一份当日舆情日报：
+
+```text
+请按本地 Doraskill skill（C:/Users/zhengchenjie/WorkBuddy/2026-09-08-17-09-31/doraskill-dev）的 SOP v10.0，为今天生成一份敦煌网跨境电商舆情日报：读取 skill-Dora.md → 用 scripts/generate_search_plan.py 生成当日检索计划 → 按 SOP 逐项检索并用 WebFetch 核验候选链接 → 用过滤规则排除不合规条目 → 按 config/briefing-entry.schema.json 录入 entries.json → 用 scripts/render_briefing.py --entries entries.json --out 日报-YYYY-MM-DD.html 渲染 HTML → 保存到当前工作区并打开预览。日期用今天，无动态友商直接省略板块。
+```
+
+> 如需指定日期，把「今天」替换为「2026-09-09」；如需人工介入核验，可在 WebFetch 后暂停并列出候选条目供确认。
+
 ### ① 生成当日检索计划
 
 ```bash
