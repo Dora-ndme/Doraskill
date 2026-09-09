@@ -3,11 +3,17 @@
 
 读取符合 config/briefing-entry.schema.json 的条目 JSON，自动完成：
     1. 字段校验（必填/枚举/日期格式/URL 形态/时间窗口）
-    2. 过滤规则自动校验（SOP 第五部分中"可确定性判定"的子集：
-       XX号自媒体、合集/周报/早报词、非详情页链接、低权重域名模式）
-       —— 语义级规则（§5.2 财报/物流 的纳入 vs 排除）需人工研判，脚本只提示不改判
-    3. 按 SOP §2.1 固定板块顺序输出（self → competitors → industry，空板块整体省略）
-    4. 渲染锁定排版 v3（760px 居中 / 4px 红色竖线 h2 / 三档情感圆角 badge / 黄底说明区）
+    2. 确定性过滤规则自动拦截（SOP §5.1：XX号自媒体、合集/周报/早报词、
+       非详情页链接、低权重域名模式）
+    3. 语义过滤层（SOP §5.2 细化对照表 / 维度③④）：财报条目区分
+       "业绩快讯（纳入）vs 纯股价/市值/减持/增发/回购炒作（排除）"；
+       物流条目区分"平台级物流产品发布（纳入）vs 友商仓储运营细节
+       （排除）"。命中排除侧信号且无纳入侧要素 → 自动拦截；纳入/排除
+       信号并存（边界冲突）或归类不确定 → warn（--strict 升级为 error）。
+       note 注明"用户指定/用户指令/指定链接"的条目按 SOP §10.1 豁免
+       自动拦截（error 降级 warn，渲染时说明区透明标注）。
+    4. 按 SOP §2.1 固定板块顺序输出（self → competitors → industry，空板块整体省略）
+    5. 渲染锁定排版 v3（760px 居中 / 4px 红色竖线 h2 / 三档情感圆角 badge / 黄底说明区）
 
 用法:
     python scripts/render_briefing.py --entries examples/entries.sample.json --out report.html
@@ -46,11 +52,85 @@ LOW_WEIGHT_SITES = ["开屏新闻", "听筒Tech", "百运网", "shuaishou.com", 
 KNOWN_PLATFORMS = {"Temu", "SHEIN", "速卖通", "亚马逊", "TikTok Shop",
                    "Shopee", "Lazada", "eBay", "京东Joybuy"}
 
+# —— 语义过滤层词表（SOP §5.2 细化对照表 / §4.1 维度③④ 过滤行）——
+# 财报域：维度③ 关键词（季度财报/Q2/Q3/年报/净营收/净利润/活跃买家/GMV/
+#         超预期/指引/财报）触发；判定"业绩快讯（纳入）vs 纯股价炒作（排除）"
+EARNINGS_TRIGGER_RE = re.compile(
+    r"财报|营收|净利|利润|业绩|GMV|活跃买家|超预期|指引|股价|市值|减持|增发|回购|涨停|跌停|年报|Q[1-4]")
+EARNINGS_KEEP_RE = re.compile(  # 纳入侧：友商业绩快讯（营收/GMV/活跃买家超预期、季度指引）
+    r"财报|季度|年报|净营收|营收|净利润|净利|利润|业绩|GMV|活跃买家|超预期|指引|同比|Q[1-4]")
+EARNINGS_DROP_RE = re.compile(  # 排除侧：纯股价/市值/减持/增发/回购炒作
+    r"股价|市值|减持|增发|回购|涨停|跌停|概念股|暴涨|暴跌|抄底|做空|套现|崩盘")
+
+# 物流域：维度④ 关键词（物流产品/x日达/履约/配送/专线/包机/海外仓网络/智慧物流）
+# 触发；判定"平台级物流产品发布（纳入）vs 友商仓储运营细节（排除）"
+LOGISTICS_TRIGGER_RE = re.compile(
+    r"物流|履约|配送|专线|包机|时效|建仓|关仓|仓储|仓库|扩容|枢纽仓|分拣|日达|平台配")
+LOGISTICS_KEEP_RE = re.compile(  # 纳入侧：平台级物流产品发布（菜鸟三日达/速卖通平台配，行业基建）
+    r"\d+日达|当日达|次日达|半日达|物流产品|平台配|全球.{0,8}达|智慧物流|物流网络|"
+    r"履约(?:网络|体系|服务|升级)|专线|包机|时效(?:承诺|升级|提速)|上线|开通|发布|覆盖")
+LOGISTICS_DROP_RE = re.compile(  # 排除侧：友商仓储运营细节（建仓/关仓/扩容/智能枢纽仓）
+    r"建仓|关仓|扩容|智能枢纽仓|枢纽仓|分拣|仓储面积|库容|万平方米|平方米|新仓|仓库|"
+    r"海外仓(?:启用|开仓|投产|扩建|落地)")
+
+_SEMANTIC_CHECKS = [
+    {
+        "domain": "财报",
+        "trigger": EARNINGS_TRIGGER_RE,
+        "keep": EARNINGS_KEEP_RE,
+        "drop": EARNINGS_DROP_RE,
+        "sop": ("SOP §5.2/维度③：✅ 纳入友商业绩快讯（营收/GMV/活跃买家超预期、季度指引），"
+                "属\"GMV 公布\"战略级；❌ 排除纯股价/市值/减持/增发/回购炒作"),
+    },
+    {
+        "domain": "物流",
+        "trigger": LOGISTICS_TRIGGER_RE,
+        "keep": LOGISTICS_KEEP_RE,
+        "drop": LOGISTICS_DROP_RE,
+        "sop": ("SOP §5.2/维度④：✅ 纳入平台级物流产品发布（菜鸟三日达、速卖通\"平台配\"，行业基建）；"
+                "❌ 排除友商仓储运营细节（建仓/关仓/扩容/智能枢纽仓）"),
+    },
+]
+
+# note 命中这些字样 = SOP §10.1"用户指定链接优先"，豁免语义自动拦截
+USER_PINNED_MARKERS = ("用户指定", "用户指令", "指定链接")
+
 
 # ---------- 校验 ----------
 
 def _parse_date(s: str) -> dt.date:
     return dt.date.fromisoformat(s)
+
+
+def semantic_checks(e: dict) -> list[tuple[str, str]]:
+    """语义过滤层（SOP §5.2 细化对照表）。仅对 competitors/industry 板块执行
+    （排除表语境均为友商；self 自身动态全部视为平台动作，不套用）。
+
+    判定逻辑（对每个命中的域）：
+      - 命中排除侧信号 且 无纳入侧要素 → ("error", ...)  纯炒作/仓储细节，自动拦截
+      - 纳入侧与排除侧信号并存 → ("warn", ...)           边界冲突，人工复核
+      - 仅命中域触发词、两侧均无信号 → ("warn", ...)      归类不确定，人工复核
+    """
+    if e.get("section") == "self":
+        return []
+    text = f"{e.get('title', '')}\n{e.get('summary', '')}"
+    out: list[tuple[str, str]] = []
+    for c in _SEMANTIC_CHECKS:
+        m_t = c["trigger"].search(text)
+        if not m_t:
+            continue
+        m_k = c["keep"].search(text)
+        m_d = c["drop"].search(text)
+        if m_d and not m_k:
+            out.append(("error", f"命中语义过滤【{c['domain']}】排除侧信号「{m_d.group(0)}」"
+                                f"且无纳入侧要素——{c['sop']}"))
+        elif m_d and m_k:
+            out.append(("warn", f"语义边界冲突【{c['domain']}】：排除侧「{m_d.group(0)}」"
+                                f"与纳入侧「{m_k.group(0)}」并存，需人工复核——{c['sop']}"))
+        elif not m_k:
+            out.append(("warn", f"语义归类不确定【{c['domain']}】：命中域触发词「{m_t.group(0)}」"
+                                f"但未检出纳入/排除信号，需人工复核——{c['sop']}"))
+    return out
 
 
 def validate(doc: dict, strict: bool = False) -> list[str]:
@@ -140,6 +220,16 @@ def validate(doc: dict, strict: bool = False) -> list[str]:
             err(f"{tag} url 命中低权重站名单: {hit}（SOP §5.1#5）")
         if "sohu.com/a/" in url_s:
             warn(f"{tag} 命中搜狐号路径模式，请人工确认是否为搜狐财经官方频道（SOP §3.3 注）")
+
+        # —— 语义过滤层（SOP §5.2：财报 业绩快讯 vs 纯炒作 / 物流 平台级 vs 仓储细节）——
+        user_pinned = any(mk in (e.get("note") or "") for mk in USER_PINNED_MARKERS)
+        for level, msg in semantic_checks(e):
+            if level == "error" and not user_pinned:
+                err(f"{tag} {msg}")
+            else:
+                suffix = "（note 注明用户指定，按 SOP §10.1 收录并在说明区透明标注）" \
+                    if user_pinned and level == "error" else ""
+                warn(f"{tag} {msg}{suffix}")
 
     return errors
 

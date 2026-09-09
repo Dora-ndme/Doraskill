@@ -27,7 +27,7 @@
       "source": "亿邦动力",
       "date": "2026-09-07",
       "sentiment": "Positive",
-      "summary": "亿邦动力获悉，Temu 半托管业务近期完成新一轮市场扩容，覆盖国家数量进一步增加，平台本地履约卖家占比环比提升。（模拟摘要）"
+      "summary": "亿邦动力获悉，Temu 半托管业务近期完成新一轮国家覆盖扩区，本地卖家数量环比持续提升。（模拟摘要）"
     },
     {
       "section": "competitors",
@@ -41,6 +41,16 @@
     },
     {
       "section": "competitors",
+      "platform": "eBay",
+      "title": "eBay 发布 2026 年第二季度财报：净营收同比增长超预期，活跃买家重回增长",
+      "url": "https://example.com/demo/ebay-q2-earnings",
+      "source": "亿邦动力",
+      "date": "2026-09-07",
+      "sentiment": "Positive",
+      "summary": "eBay 公布 2026 财年第二季度业绩：净营收同比增长 11% 超出市场预期，活跃买家数量重回增长区间，公司上调全年业绩指引。（模拟摘要）"
+    },
+    {
+      "section": "competitors",
       "platform": "TikTok Shop",
       "title": "TikTok Shop 美区夏季大促收官：GMV 同比增长翻倍，直播场次创新高",
       "url": "https://example.com/demo/tts-summer-sale",
@@ -48,6 +58,15 @@
       "date": "2026-09-07",
       "sentiment": "Positive",
       "summary": "第三方机构测算数据显示，TikTok Shop 美区夏季大促期间 GMV 同比显著增长，直播带货场次与达人参与数均创历史新高。（模拟摘要）"
+    },
+    {
+      "section": "industry",
+      "title": "菜鸟宣布全球五日达物流产品新增 8 国，跨境履约时效竞争持续升级",
+      "url": "https://example.com/demo/cainiao-5day-8countries",
+      "source": "中国新闻网",
+      "date": "2026-09-07",
+      "sentiment": "Positive",
+      "summary": "菜鸟宣布旗下全球五日达物流产品完成新一轮扩区，新增 8 个国家与地区，行业跨境履约时效竞争进一步升级。（模拟摘要）"
     },
     {
       "section": "industry",
