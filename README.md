@@ -65,13 +65,26 @@ Doraskill/
 
 ### 📋 复制给 Agent 的一句话指令
 
-如果你正在使用 WorkBuddy / CodeBuddy 等 Agent，直接把下面这段指令粘贴发送，即可按本 skill 完成一份当日舆情日报：
+如果你正在使用 WorkBuddy / CodeBuddy 等 Agent，直接把下面这段指令粘贴发送即可。**首次会自动从 GitHub 下载到本地，之后一直复用**，无需任何手动配置：
 
 ```text
-请按本地 Doraskill skill（C:/Users/zhengchenjie/WorkBuddy/2026-09-08-17-09-31/doraskill-dev）的 SOP v10.0，为今天生成一份敦煌网跨境电商舆情日报：读取 skill-Dora.md → 用 scripts/generate_search_plan.py 生成当日检索计划 → 按 SOP 逐项检索并用 WebFetch 核验候选链接 → 用过滤规则排除不合规条目 → 按 config/briefing-entry.schema.json 录入 entries.json → 用 scripts/render_briefing.py --entries entries.json --out 日报-YYYY-MM-DD.html 渲染 HTML → 保存到当前工作区并打开预览。日期用今天，无动态友商直接省略板块。
+请用 Doraskill 为我生成今天的敦煌网跨境电商舆情日报（HTML）：
+
+1. 若本地还没有 Doraskill，先下载安装：
+   git clone https://github.com/Dora-ndme/Doraskill.git ~/.workbuddy/doraskill
+   （Windows 等价于 %USERPROFILE%\.workbuddy\doraskill；已存在则跳过本步）
+
+2. 读取 ~/.workbuddy/doraskill/skill-Dora.md（SOP v10.0），严格按 SOP 执行：
+   - 用 scripts/generate_search_plan.py --date <今天> 生成当日检索计划
+   - 按 SOP 逐项检索，用 WebFetch 核验候选链接（标题一字不差 / 发布日期 / 摘要取自原文 / 情感标签 / 信源合规）
+   - 过过滤规则排除不合规条目（XX号自媒体 / 合集周报 / 仓储细节 / 低权重站等）
+   - 按 config/briefing-entry.schema.json 录入 entries.json
+   - 用 scripts/render_briefing.py --entries entries.json --out 日报-<日期>.html 渲染 HTML
+
+3. 把渲染出的 HTML 保存到当前工作区并打开预览；无动态友商直接省略对应板块。
 ```
 
-> 如需指定日期，把「今天」替换为「2026-09-09」；如需人工介入核验，可在 WebFetch 后暂停并列出候选条目供确认。
+> 脚本均位于克隆后的 `~/.workbuddy/doraskill/scripts/` 目录，运行前 `cd ~/.workbuddy/doraskill` 或使用完整路径均可。如需指定日期，把「今天」替换为具体日期；如需人工介入核验，可在 WebFetch 后暂停并列出候选条目供确认。
 
 ### ① 生成当日检索计划
 
